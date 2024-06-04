@@ -13,6 +13,7 @@ import { $confirmText, GAME_PROP, ROUTE_PATH } from "@/config";
 import { $confirm } from "@/utils/busTransfer";
 import { _debounce, _promiseTimeout } from "@/utils/tool";
 import { useChangeListLineNum, usePlayAudio } from "@/hooks";
+import { vCardIntoAnimate } from "@/directives";
 
 defineOptions({
   name: "KingCrystal",
@@ -23,7 +24,7 @@ const $router = useRouter();
 const $knapsackStore = KnapsackStore();
 const $kingCrystalStore = KingCrystalStore();
 
-const { scroll, filter_list } = storeToRefs($kingCrystalStore);
+const { scroll, show_list, finish, loading } = storeToRefs($kingCrystalStore);
 
 const { playAudio } = usePlayAudio();
 const { line_num } = useChangeListLineNum(4, [
@@ -34,7 +35,7 @@ const { line_num } = useChangeListLineNum(4, [
 ]);
 
 const skinToolbarRef = ref<InstanceType<typeof SkinToolbar>>();
-const virtualListRef = ref<GenericComponentInstanceType<typeof LibVirtualList>>();
+const libVirtualListRef = ref<GenericComponentInstanceType<typeof LibVirtualList>>();
 
 /** 显示列表 */
 const show_skin_list = ref(false);
@@ -60,7 +61,7 @@ const onSidebarChange = () => {
  * @param data 英雄或皮肤数据
  */
 const onExchange = (e: Event, data: Game.Hero.Skin) => {
-  if ($knapsackStore.articles.SKIN_DEBRIS >= Number(data.debris)) {
+  if ($knapsackStore.articles.KING_CRYSTAL > 0) {
     $confirm({
       text: $confirmText("r36m", {
         name: `${data.heroName}-${data.name}`,
@@ -76,25 +77,30 @@ const onExchange = (e: Event, data: Game.Hero.Skin) => {
     });
   } else {
     $confirm({
-      text: $confirmText("p89n", { prop: GAME_PROP.NAME["HERO_DEBRIS"] }),
+      text: $confirmText("p89n", { prop: GAME_PROP.NAME["KING_CRYSTAL"] }),
       confirm() {
-        $router.push(ROUTE_PATH.PROP_SHOP);
+        $router.push(ROUTE_PATH.HERO_LOTTERY);
       },
     });
   }
 };
 
+/** @description 加载更多 */
+const onLoadMore = () => {
+  $kingCrystalStore.loadMore().then(() => {
+    libVirtualListRef.value?._updateStatus();
+  });
+};
+
 /** @description 返回顶部 */
 const onBackTop = () => {
-  virtualListRef.value?._setPosition(0, false);
+  libVirtualListRef.value?._setPosition(0, false);
 };
 
 onActivated(async () => {
   playAudio("h3w0");
-  virtualListRef.value?._setPosition(scroll.value);
-  virtualListRef.value?._updateStatus();
+  libVirtualListRef.value?._setPosition(scroll.value);
 
-  //显示英雄列表
   await _promiseTimeout(250);
   show_skin_list.value = true;
 });
@@ -111,17 +117,21 @@ onActivated(async () => {
 
       <transition name="fade">
         <LibVirtualList
-          v-if="filter_list.length && show_skin_list"
-          ref="virtualListRef"
-          :data="filter_list"
+          v-if="show_list.length && show_skin_list"
+          ref="libVirtualListRef"
+          :data="show_list"
           :column-count="line_num"
+          :loading="loading"
+          :finish="finish"
           @scroll="debounceScroll"
+          @load-more="onLoadMore"
           v-slot="{ data }"
         >
           <div
             v-for="(item, index) in data"
             :key="item.id"
             ref="skinCardRefs"
+            v-card-into-animate
             class="skin-card"
             :style="{
               'transition-delay': (index % (line_num * 2)) * 0.1 + 's',
@@ -131,7 +141,7 @@ onActivated(async () => {
           </div>
         </LibVirtualList>
       </transition>
-      <KEmpty v-if="filter_list.length === 0" tip="暂无可兑换皮肤" />
+      <KEmpty v-if="show_list.length === 0" tip="暂无可兑换皮肤" />
     </div>
 
     <!--右侧职业分类侧边栏-->

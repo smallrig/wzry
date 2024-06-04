@@ -10,7 +10,7 @@ import { GAME_HERO } from "@/api";
 import { $confirmText, GAME_PROP, ROUTE_PATH } from "@/config";
 import { $confirm } from "@/utils/busTransfer";
 import { _promiseTimeout } from "@/utils/tool";
-import { KEmpty } from "@/components/business";
+import { KEmpty, KPropNum } from "@/components/business";
 import { useChangeListLineNum, usePlayAudio } from "@/hooks";
 
 defineOptions({
@@ -55,7 +55,7 @@ getSkinList();
  * @param data 皮肤数据
  */
 const onExchange = (e: Event, data: Game.Hero.Skin) => {
-  if ($knapsackStore.articles.SKIN_DEBRIS >= Number(data.debris)) {
+  if ($knapsackStore.articles.HONOR_CRYSTAL > 0) {
     $confirm({
       text: $confirmText("r36m", {
         name: `${data.heroName}-${data.name}`,
@@ -70,9 +70,9 @@ const onExchange = (e: Event, data: Game.Hero.Skin) => {
     });
   } else {
     $confirm({
-      text: $confirmText("p89n", { prop: GAME_PROP.NAME["HERO_DEBRIS"] }),
+      text: $confirmText("p89n", { prop: GAME_PROP.NAME["HONOR_CRYSTAL"] }),
       confirm() {
-        $router.push(ROUTE_PATH.PROP_SHOP);
+        $router.push(ROUTE_PATH.SKIN_LOTTERY);
       },
     });
   }
@@ -90,6 +90,12 @@ onActivated(async () => {
 <template>
   <div class="skin">
     <div class="skin-main">
+      <transition name="to-bottom" appear>
+        <div class="tool-bar">
+          <KPropNum prop-key="HONOR_CRYSTAL" height="3rem" margin-right="1rem" />
+        </div>
+      </transition>
+
       <transition name="card-list">
         <LibGrid
           v-if="collection_list.length && show_skin_list"

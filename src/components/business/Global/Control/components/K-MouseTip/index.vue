@@ -4,6 +4,7 @@ import { onMounted } from "vue";
 
 import { connectCircle } from "./helper/connectCircle";
 import { useMouseTip } from "./hooks/useMouseTip";
+import { vPreventOverflow } from "./directives/prevent-overflow";
 
 import { _debounce } from "@/utils/tool";
 
@@ -130,7 +131,7 @@ eval(
             ref="dotRef"
             class="dot"
             :class="{
-              downing: downing,
+              downing,
               clickable: show_tip && !is_click && !disabled,
               input: type === 'INPUT',
             }"
@@ -145,9 +146,10 @@ eval(
             :class="[
               tip_position,
               {
+                disabled,
                 show: show_tip && !is_click,
-                disabled: disabled,
                 clickable: !is_click,
+                tip: type === 'TIP',
               },
             ]"
             :style="{
@@ -157,6 +159,7 @@ eval(
             <!-- tip框 -->
             <div
               ref="tipRef"
+              v-prevent-overflow
               class="tip"
               :class="{
                 show: show_tip && !is_click,
@@ -172,10 +175,11 @@ eval(
           ref="roundBoxRef"
           class="round-box"
           :class="{
-            clickable: show_tip && !disabled && !is_click,
-            disabled: disabled,
-            moving: moving,
-            downing: downing,
+            disabled,
+            moving,
+            downing,
+            clickable: show_tip && !disabled && !is_click && type !== 'TIP',
+            tip: type === 'TIP',
           }"
           :style="{ left: x + 2.5 + 'px', top: y + 2.5 + 'px' }"
         >

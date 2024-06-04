@@ -2,7 +2,6 @@ import Control from "./Global/Control/index.vue";
 import WaterMark from "./Global/WaterMark/index.vue";
 import KBackTop from "./Parts/K-BackTop/index.vue";
 import KButton from "./Parts/K-Button/index.vue";
-import KLogo from "./Parts/K-Logo/index.vue";
 import KCheck from "./Parts/K-Check/index.vue";
 import KDialog from "./Parts/K-Dialog/index.vue";
 import KInput from "./Parts/K-Input/index.vue";
@@ -15,6 +14,7 @@ import KProp from "./Parts/K-Prop/index.vue";
 import KHelp from "./Parts/K-Help/index.vue";
 import KEmpty from "./Parts/K-Empty/index.vue";
 import KSelect from "./Parts/K-Select/index.vue";
+import KPropNum from "./Parts/K-Prop-Num/index.vue";
 import KLongNum from "./Parts/K-LongNum/index.vue";
 import KLoadingRadiate from "./Parts/K-LoadingRadiate/index.vue";
 import KText from "./Parts/K-Text/index.vue";
@@ -43,9 +43,9 @@ export {
   KLoadingIcon,
   KMarquee,
   KRange,
-  KLogo,
   KLongNum,
   KProp,
+  KPropNum,
   KCategory,
   KEmpty,
   KLoadingRadiate,
