@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onActivated, ref } from "vue";
+import { nextTick, onActivated, ref, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
 
@@ -18,6 +18,12 @@ import { vCardIntoAnimate } from "@/directives";
 defineOptions({
   name: "KingCrystal",
 });
+
+interface Props {
+  /** 为了解决虚拟列表更新问题，进入活动页或任务页时，页面会隐藏，再次进入列表可能会无法加载 */
+  visible: boolean;
+}
+const $props = defineProps<Props>();
 
 const $router = useRouter();
 
@@ -50,9 +56,18 @@ const debounceScroll = _debounce((v: number) => {
   back_top.value = v > 250;
 }, 250);
 
+/** @description 页面筛选隐藏显示动画 */
+const onFilterChange = () => {
+  debounceScroll(0);
+  show_skin_list.value = false;
+  nextTick(() => {
+    show_skin_list.value = true;
+  });
+};
+
 /** @description 点击侧边栏触发 */
 const onSidebarChange = () => {
-  debounceScroll(0);
+  onFilterChange();
   skinToolbarRef.value?._clearName();
 };
 
@@ -96,6 +111,17 @@ const onLoadMore = () => {
 const onBackTop = () => {
   libVirtualListRef.value?._setPosition(0, false);
 };
+
+watch(
+  () => $props.visible,
+  (v) => {
+    show_skin_list.value = v;
+
+    nextTick(() => {
+      libVirtualListRef.value?._setPosition(scroll.value);
+    });
+  },
+);
 
 onActivated(async () => {
   playAudio("h3w0");
@@ -145,7 +171,7 @@ onActivated(async () => {
     </div>
 
     <!--右侧职业分类侧边栏-->
-    <FilterSidebar type="skin" @change="onSidebarChange" />
+    <FilterSidebar type="kingCrystal" @change="onSidebarChange" />
   </div>
 </template>
 
