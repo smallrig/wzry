@@ -17,13 +17,15 @@ import {
 import { vMouseTip, vTypewriterSingle } from "@/directives";
 import { _promiseTimeout } from "@/utils/tool";
 import { $message } from "@/utils/busTransfer";
-import { GAME_PROP, MESSAGE_TIP } from "@/config";
+import { GAME_PROP, MESSAGE_TIP, MOUSE_TIP } from "@/config";
 import { _getPropLink } from "@/utils/concise";
+import { usePlayAudio } from "@/hooks";
 
 const modelValue = defineModel<boolean>({ required: true });
 
 const { setHidePosterGuessPart } = useHidePosterGuess();
 const { setHideActivityPart } = useIntoGame();
+const { playAudio } = usePlayAudio();
 
 /** 关闭活动 */
 const closeActivity = inject<() => void>("close-activity")!;
@@ -93,7 +95,9 @@ const exitGuess = () => {
   if (show_receive.value) {
     receiveGuessCoin();
   }
+
   handleClose();
+  playAudio("pj83");
 };
 </script>
 
@@ -175,7 +179,7 @@ const exitGuess = () => {
               ></div>
               <div class="count">×{{ guess_coin }}</div>
             </div>
-            <KButton type="warning" @click="receiveGuessCoin">领取竞猜币</KButton>
+            <KButton v-mouse-tip type="warning" @click="receiveGuessCoin">领取竞猜币</KButton>
           </div>
         </transition>
 
@@ -200,10 +204,22 @@ const exitGuess = () => {
         <!-- 是否进入下一题 -->
         <transition name="to-top">
           <div v-show="show_btn" class="btns">
-            <div class="close" @click="handleClose">
+            <div
+              v-mouse-tip="{
+                text: MOUSE_TIP.hq27,
+              }"
+              class="close"
+              @click="handleClose"
+            >
               <i class="iconfont wzry-guanbi"></i>
             </div>
-            <div class="next" @click="handleNext">
+            <div
+              v-mouse-tip="{
+                text: MOUSE_TIP.xw29,
+              }"
+              class="next"
+              @click="handleNext"
+            >
               <i
                 class="iconfont wzry-dui"
                 :class="answer_status === 1 ? 'wzry-you' : 'wzry-dui'"
@@ -223,7 +239,7 @@ const exitGuess = () => {
         </transition>
 
         <transition name="to-top">
-          <KButton v-if="!guessing" type="error" class="exit-guess" @click="exitGuess">
+          <KButton v-if="!guessing" v-mouse-tip type="error" class="exit-guess" @click="exitGuess">
             退出竞猜
           </KButton>
         </transition>

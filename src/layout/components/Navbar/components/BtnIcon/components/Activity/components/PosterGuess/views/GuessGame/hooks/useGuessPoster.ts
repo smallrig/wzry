@@ -2,13 +2,13 @@ import { onScopeDispose, ref } from "vue";
 
 import { useCloseToStore } from "../../../../../common/hooks/useCloseToStore";
 
-import { LOCAL_HERO, KVP_HERO, LOCAL_TYPE } from "@/api";
+import { LOCAL_HERO, KVP_HERO } from "@/api";
 import { _formatSeconds, _promiseTimeout, _random } from "@/utils/tool";
 import { AuthStore, KnapsackStore } from "@/store";
 import { $message, $obtain, $tip } from "@/utils/busTransfer";
 import { $msgTipText, CUSTOM_TIP, GAME_CONFIG, GAME_PROP } from "@/config";
 import { _getPropLink } from "@/utils/concise";
-import { useSetMarker } from "@/hooks";
+import { usePlayAudio, useSetMarker } from "@/hooks";
 
 /**
  * @description 海报竞猜
@@ -20,6 +20,7 @@ const useGuessPoster = (closeActivity: () => void, closeGame: () => Promise<void
   const $authStore = AuthStore();
 
   const { addStatusMarkerNum } = useSetMarker();
+  const { playAudio } = usePlayAudio();
 
   /** 当前皮肤ID */
   let skin_id = 0;
@@ -43,12 +44,8 @@ const useGuessPoster = (closeActivity: () => void, closeGame: () => Promise<void
   let kvp_skin_img: Record<number, Omit<Remote.Skin.Image, "id">> = {};
   /** 需要过滤的皮肤ID */
   let skin_ids: number[] = [];
-  /** 需要过滤的情侣皮肤类型ID */
-  let filter_types: number[] = [];
-  /** 需要过滤的同封面皮肤ID
-   * 乒乓鲁班
-   */
-  const filter_sames: number[] = [1127, 5252];
+  /** 需要过滤的同框皮肤ID */
+  let filter_same_poster: number[] = [];
 
   const ExposeData = {
     /** 当前输入的答案 */
@@ -98,8 +95,8 @@ const useGuessPoster = (closeActivity: () => void, closeGame: () => Promise<void
   } = ExposeData;
 
   //筛选情侣皮肤ID
-  LOCAL_TYPE.getTypeSkinList().then((res) => {
-    filter_types = res.filter((item) => item.alias === "情侣").map((item) => item.id);
+  LOCAL_HERO.getSkinSameList().then((res) => {
+    filter_same_poster = res;
   });
 
   /* 保存配置 */
@@ -156,11 +153,7 @@ const useGuessPoster = (closeActivity: () => void, closeGame: () => Promise<void
 
       //过滤无可用海报的皮肤ID
       const skin_list = complete_skin_list.filter((item) => {
-        return (
-          !skin_ids.includes(item) &&
-          !filter_types.includes(skin_type_kvp[item]) &&
-          !filter_sames.includes(item)
-        );
+        return !skin_ids.includes(item) && !filter_same_poster.includes(skin_type_kvp[item]);
       });
 
       //可用海报数量低于51个
@@ -209,6 +202,7 @@ const useGuessPoster = (closeActivity: () => void, closeGame: () => Promise<void
         addStatusMarkerNum("POSTER_GUESS_WRONG_COUNT");
       }
 
+      playAudio("pj83");
       await _promiseTimeout(2000);
 
       show_status.value = true;
@@ -254,7 +248,7 @@ const useGuessPoster = (closeActivity: () => void, closeGame: () => Promise<void
 
     /** @description 设置已退出竞猜 */
     setIsExit() {
-      is_destroyed = false;
+      is_destroyed = true;
     },
   };
   const { randomPoster } = ExposeMethods;

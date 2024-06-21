@@ -258,9 +258,11 @@ export const _imageOptimizer = (obj: ImageOptimizerOptions) => {
   if (!files) return;
 
   const name = files.name;
+  const extension = name.split(".").pop()!.toLowerCase();
   const ratio = obj.ratio || 1;
   const maxSize = obj.maxSize || 1024;
   const width = obj.width || 10000;
+  const mimeType = files.type;
 
   function dataURLtoFile(dataURL: string, filename: string) {
     const arr = dataURL.split(",");
@@ -303,14 +305,16 @@ export const _imageOptimizer = (obj: ImageOptimizerOptions) => {
           context!.drawImage(image, 0, 0, image.width, image.height);
         }
 
-        const dataUrl = canvas.toDataURL("image/jpeg", ratio);
-        const file = dataURLtoFile(dataUrl, name);
+        const dataUrl = canvas.toDataURL(mimeType, ratio);
+        const newName = `${name.split(".")[0]}.${extension}`;
+        const file = dataURLtoFile(dataUrl, newName);
         obj.success(formData(file), file, dataUrl);
         canvas.remove();
       };
       image.onerror = obj.fail as any;
     } else {
-      const file = dataURLtoFile(result, name);
+      const newName = `${name.split(".")[0]}.${extension}`;
+      const file = dataURLtoFile(result, newName);
       obj.success(formData(file), file, result);
       canvas.remove();
     }
@@ -421,7 +425,7 @@ export const _downloadImage = (link: string, name: string) => {
     });
 };
 
-/** @description 配置合并，如果当前配置有但初始配置没有的属性，则会删除该属性，反之添加
+/** @description 配置合并，如果当前配置有但初始配置没有的属性
  * @param config 当前配置
  * @param initialConfig 初始配置
  */
@@ -1101,7 +1105,7 @@ export class _LoadMore {
     const y = this.el.scrollTop;
     this.scroll && this.scroll(y);
 
-    //就算距离底部的距离
+    //计算距离底部的距离
     const d = this.el.scrollHeight - this.el.clientHeight - y;
 
     //注意：当所有数据加载完成，在进入加载高度时会持续触发，需要在加载更多方法里通过总页数>当前页数来进行限制触发
