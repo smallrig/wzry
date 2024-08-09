@@ -45,15 +45,17 @@ const debounceSearch = _debounce(() => {
 }, 500);
 
 onMounted(() => {
-  $tip({
-    text: SCENE_TIP.f1y0,
-    align: "left-bottom",
-    color: false,
-    createFn() {
-      $focus.show(collocationBtnRef.value!.$el);
-    },
-    btnFn: $focus.close,
-  });
+  setTimeout(() => {
+    $tip({
+      text: SCENE_TIP.f1y0,
+      align: "left-bottom",
+      color: false,
+      createFn() {
+        $focus.show(collocationBtnRef.value!.$el);
+      },
+      btnFn: $focus.close,
+    });
+  }, 500);
 });
 
 defineExpose({
@@ -69,7 +71,7 @@ defineExpose({
       进入铭文搭配
     </KButton>
     <!-- 筛选铭文颜色 -->
-    <FilterColor @change="onFilterColor" />
+    <FilterColor v-model="$epigraphStore.color" @update:model-value="onFilterColor" />
 
     <!-- 搜索 -->
     <KInput

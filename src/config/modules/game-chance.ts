@@ -1,4 +1,4 @@
-import { TreasureChance } from "../interface";
+import type { TreasureChance } from "../interface";
 
 /** @description 每日福袋概率 */
 export const BLESSING_BAG_CHANCE: TreasureChance = {
@@ -9,8 +9,8 @@ export const BLESSING_BAG_CHANCE: TreasureChance = {
   },
   HERO_DEBRIS: {
     count: 1,
-    num: 25,
-    key: "SKIN_CHEST_EPIC_OPTIONAL",
+    num: 5,
+    key: "SKIN_EPIC_TREASURE",
   },
   SKIN_DEBRIS: {
     count: 1,

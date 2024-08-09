@@ -1,4 +1,4 @@
-import { YiBaoStoreType } from "@/store/interface";
+import type { YiBaoStoreType } from "@/store/interface";
 import { _isPhone } from "@/utils/tool";
 
 /** @description 默认英雄信息 */
@@ -247,8 +247,9 @@ export const configDefault: () => Global.SettingConfig = () => ({
   musicProgress: false,
   speed: 1,
   shine: true,
-  particle: false,
+  particle: true,
   language: 0,
+  lotteryAnimation: true,
   noTips: {
     f1y0: false,
     mu63: false,

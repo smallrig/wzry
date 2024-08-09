@@ -78,7 +78,7 @@ const AtlasStore = defineStore("atlas", () => {
     filterGender();
     sortType();
     $usePagingLoad.resetPage();
-    $bus.emit("watch-waterfall");
+    $bus.emit("update-waterfall");
   };
   const ExposeMethods = {
     /** @description 设置滚动坐标 */
@@ -99,6 +99,7 @@ const AtlasStore = defineStore("atlas", () => {
           poster: hero.poster,
           name: hero.name,
           heroName: "",
+          heroId: hero.id,
           type: "HERO",
           profession: hero.profession,
           gender: hero.gender,
@@ -109,6 +110,7 @@ const AtlasStore = defineStore("atlas", () => {
         hero.skins.forEach((skin) => {
           data.push({
             id: skin.id,
+            heroId: hero.id,
             cover: skin.cover,
             coverBlur: skin.posterBlur,
             name: skin.name,
@@ -142,7 +144,6 @@ const AtlasStore = defineStore("atlas", () => {
      * @param name 性别标识符
      */
     filterGender(name: Game.GenderId) {
-      if (gender_type.value === name) return;
       gender_type.value = name;
       sortAll();
     },
@@ -175,7 +176,7 @@ const AtlasStore = defineStore("atlas", () => {
         ]);
         setFilterData(data);
 
-        $bus.emit("watch-waterfall");
+        $bus.emit("update-waterfall");
       } else {
         sortAll();
       }

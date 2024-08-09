@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import { computed, ref } from "vue";
+
 import EpigraphToolbar from "./components/EpigraphToolbar/index.vue";
 import EpigraphList from "./components/EpigraphList/index.vue";
 
-import { vScrollVirtualization } from "@/directives";
 import { KCategory } from "@/components/business";
 import { EpigraphStore } from "@/store";
 
@@ -21,27 +22,34 @@ const epigraph: Game.Epigraph.Category[] = [
   "穿透",
 ];
 
-/** @description 筛选
- * @param index 筛选分类索引
- */
-const onTab = (index: number) => {
-  $epigraphStore.setFilter(epigraph[index]);
-};
+const epigraphToolbarRef = ref<InstanceType<typeof EpigraphToolbar>>();
+
+/** 当前类别索引 */
+const current_index = computed({
+  get() {
+    return epigraph.indexOf($epigraphStore.type);
+  },
+  set(index) {
+    $epigraphStore.setFilter(epigraph[index]);
+  },
+});
 </script>
 
 <template>
   <!-- 铭文类型分类 -->
   <transition name="to-bottom" appear>
     <div class="tool">
-      <EpigraphToolbar />
-      <KCategory :options="epigraph" @tab="onTab" />
+      <EpigraphToolbar ref="epigraphToolbarRef" />
+      <KCategory
+        v-model="current_index"
+        :options="epigraph"
+        @update:model-value="epigraphToolbarRef?._clearName"
+      />
     </div>
   </transition>
 
   <!-- 铭文列表 -->
-  <div v-scroll-virtualization class="epigraph-main">
-    <EpigraphList />
-  </div>
+  <EpigraphList />
 </template>
 
 <style scoped lang="less">
