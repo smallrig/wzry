@@ -11,10 +11,10 @@ import Footbar from "@/layout/components/Footbar/index.vue";
 import { KVideo } from "@/components/business";
 import { _promiseTimeout } from "@/utils/tool";
 import { _getVideoLink } from "@/utils/concise";
-import { usePlayAudio } from "@/hooks";
+import { useStaticResourceVersion } from "@/hooks";
 
 const { status } = useBarrages();
-const { playAudio } = usePlayAudio();
+const { video_home_version } = useStaticResourceVersion();
 
 /** 显示侧边栏 */
 const show_sidebar = ref(false);
@@ -26,8 +26,6 @@ const show_foot_bar = ref(false);
 const show_app_main = ref(false);
 
 onMounted(async () => {
-  playAudio("p53r");
-
   await _promiseTimeout(1000);
   show_sidebar.value = true;
 
@@ -65,7 +63,12 @@ onMounted(async () => {
     </div>
 
     <!-- 视频背景 -->
-    <KVideo :link="_getVideoLink('bg')" muted />
+    <KVideo
+      v-if="video_home_version"
+      style="filter: brightness(0.75)"
+      :link="_getVideoLink('bg', video_home_version)"
+      muted
+    />
   </div>
 </template>
 
